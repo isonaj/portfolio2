@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Portfolio2.ViewModels.Portfolio>
+
+@{
+    ViewBag.Title = "Portfolio";
+}
+
+<h2>Txns</h2>
+
+<table class="table">
+    <tr>
+        <th>Code</th>
+        <th>Units</th>
+        <th>Purchase Price</th>
+        <th>Purchase Value</th>
+        <th>Dividends</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Units)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurchasePrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurchaseValue)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dividends)
+            </td>
+        </tr>
+    }
+</table>

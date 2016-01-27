@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Portfolio2.Data.Models.Txn>
+
+@{
+    ViewBag.Title = "Txns";
+}
+
+<h2>Txns</h2>
+
+<p>
+    <a asp-controller="Txns" asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <tr>
+        <th>TxnDate</th>
+        <th>Code</th>
+        <th>Type</th>
+        <th>Units</th>
+        <th>Amount</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TxnDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Stock.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TxnType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Units)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+        </tr>
+    }
+</table>
