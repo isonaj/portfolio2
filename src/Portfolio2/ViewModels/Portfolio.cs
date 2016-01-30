@@ -12,6 +12,7 @@ namespace Portfolio2.ViewModels
         public string Code { get; set; }
         public int Units { get; set; }
         public decimal LastPrice { get; set; }
+        public DateTime LastPriceDate { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal CurrentValue { get; set; }
         public decimal PurchaseValue { get; set; }
@@ -21,6 +22,7 @@ namespace Portfolio2.ViewModels
         public decimal TotalYield { get; set; }
         public decimal AvgYield { get; set; }
         public decimal IRR { get; set; }
+        public decimal AnnualisedReturn { get; set; }
 
         public List<Txn> Txns { get; set; }
 

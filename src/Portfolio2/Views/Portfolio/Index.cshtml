@@ -18,6 +18,7 @@
         <th>Growth %</th>
         <th>Dividends</th>
         <th>IRR</th>
+        <th>Ann. Return</th>
     </tr>
 
     @foreach (var item in Model)
@@ -53,6 +54,22 @@
             <td>
                 @Html.DisplayFor(modelItem => item.IRR)
             </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AnnualisedReturn)
+            </td>
         </tr>
     }
+    <tr>
+        <td>Total:</td>
+        <td>@ViewBag.Count</td>
+        <td></td>
+        <td></td>
+        <td>@ViewBag.CurrentValue</td>
+        <td>@ViewBag.PurchaseValue</td>
+        <td>@ViewBag.Profit</td>
+        <td>@ViewBag.Growth</td>
+        <td>@ViewBag.Dividends</td>
+        <td>@ViewBag.IRR</td>
+        <td>@ViewBag.AnnualisedReturn</td>
+    </tr>
 </table>
