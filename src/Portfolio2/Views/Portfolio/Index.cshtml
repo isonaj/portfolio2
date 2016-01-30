@@ -10,9 +10,14 @@
     <tr>
         <th>Code</th>
         <th>Units</th>
+        <th>Last Price</th>
         <th>Purchase Price</th>
+        <th>Current Value</th>
         <th>Purchase Value</th>
+        <th>Profit</th>
+        <th>Growth %</th>
         <th>Dividends</th>
+        <th>IRR</th>
     </tr>
 
     @foreach (var item in Model)
@@ -25,13 +30,28 @@
                 @Html.DisplayFor(modelItem => item.Units)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.LastPrice)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.PurchasePrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrentValue)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PurchaseValue)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Profit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Growth)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Dividends)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IRR)
             </td>
         </tr>
     }

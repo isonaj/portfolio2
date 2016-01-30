@@ -8,6 +8,7 @@ namespace Portfolio2.ViewModels
 {
     public class Portfolio
     {
+        public int StockId { get; set; }
         public string Code { get; set; }
         public int Units { get; set; }
         public decimal LastPrice { get; set; }
