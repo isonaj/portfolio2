@@ -23,6 +23,8 @@ namespace Portfolio2.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
+            return View();
+
             var txns = (from t in _db.Txns.Include(t => t.Stock)
                         orderby t.Stock.Code, t.TxnDate
                         select t).ToList();
@@ -36,6 +38,7 @@ namespace Portfolio2.Controllers
             ViewBag.Dividends = portfolio.Sum(p => p.Dividends);
             ViewBag.IRR = CalculateIRR(txns, portfolio.Max(p => p.LastPriceDate), portfolio.Sum(p => p.CurrentValue)) * 100;
             ViewBag.AnnualisedReturn = Math.Round(Math.Pow((double)((ViewBag.Profit + ViewBag.Dividends) / ViewBag.PurchaseValue + 1), 1 / ((portfolio.Max(p => p.LastPriceDate) - txns.Min(t => t.TxnDate)).TotalDays / 365)) * 100 - 100, 2);
+
 
             return View(portfolio);
         }

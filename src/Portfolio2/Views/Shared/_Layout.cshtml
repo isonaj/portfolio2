@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
-<body>
+<body ng-cloak>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -34,8 +34,6 @@
                     <li><a asp-controller="Portfolio" asp-action="Index">Portfolio</a> </li>
                     <li><a asp-controller="Txns" asp-action="Index">Txns</a></li>
                     <li><a asp-controller="Upload" asp-action="Index">Upload</a></li>
-                    <li><a asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
             </div>
         </div>

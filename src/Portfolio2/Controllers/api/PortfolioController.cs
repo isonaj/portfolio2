@@ -33,29 +33,6 @@ namespace Portfolio2.Controllers.api
             foreach (var p in portfolio)
                 p.Txns = null;
 
-            var p2 = new List<Portfolio>
-            {
-                new Portfolio { Code = "ALU",
-                    AnnualisedReturn = 5.80887292179400M,
-                    AvgYield = 0,
-                    CurrentValue = 5170.92M,
-                    Dividends = 42.48M,
-                    Growth = 3.0324404779695261550232827800M,
-                    IRR = 9.00M,
-                    LastPrice = 4.92M,
-                    LastPriceDate = new DateTime(2016, 1, 29),
-                    Profit = 152.1900000000000000000000000M,
-                    PurchasePrice = 4.7751950523311132254995242626M,
-                    PurchaseValue = 5018.7300000000000000000000000M,
-                    StockId = 47,
-                    TotalYield = 0,
-                    Units = 1051,
-                    Txns = new List<Txn>
-                    {
-                        new Txn { TxnType = "Buy", Units = 100, Amount = -3000, Stock = new Stock { Code = "ALU" } }
-                    }
-                }
-            };
             return new ObjectResult(portfolio);
         }
 
