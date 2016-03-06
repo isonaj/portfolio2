@@ -8,6 +8,13 @@
     portfolioController.$inject = ['$scope', 'portfolioService']; 
 
     function portfolioController($scope, portfolioService) {
-        $scope.portfolio = portfolioService.query();
+        portfolioService.getData()
+            .success(function (data) {
+                console.log('success');
+                $scope.portfolio = data;
+            });
+
+
+        //$scope.portfolio = portfolioService.query();
     }
 })();

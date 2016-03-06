@@ -30,7 +30,7 @@ namespace Portfolio2.Controllers.api
                         select t).ToList();
             var portfolio = ProcessPortfolio(txns);
 
-            foreach (var p in portfolio)
+            foreach (var p in portfolio.Items)
                 p.Txns = null;
 
             return new ObjectResult(portfolio);
@@ -56,18 +56,18 @@ namespace Portfolio2.Controllers.api
         }
         */
 
-        List<Portfolio> ProcessPortfolio(List<Data.Models.Txn> txns)
+        Portfolio ProcessPortfolio(List<Data.Models.Txn> txns)
         {
-            var result = new List<Portfolio>();
-            Portfolio p = null;
+            var result = new Portfolio();
+            PortfolioItem p = null;
             foreach (var t in txns)
             {
                 if (p == null || p.Code != t.Stock.Code)
                 {
-                    p = new Portfolio();
+                    p = new PortfolioItem();
                     p.Code = t.Stock.Code;
                     p.StockId = t.StockId;
-                    result.Add(p);
+                    result.Items.Add(p);
                 }
                 p.Units += t.Units;
 
@@ -82,7 +82,7 @@ namespace Portfolio2.Controllers.api
                 p.Txns.Add(t);
             }
 
-            foreach (var p2 in result)
+            foreach (var p2 in result.Items)
             {
                 // Get last price
                 var price = _db.PriceHistory
@@ -107,6 +107,14 @@ namespace Portfolio2.Controllers.api
                 p2.IRR = CalculateIRR(p2.Txns, p2.LastPriceDate, p2.CurrentValue) * 100;
             }
 
+            result.CurrentValue = Math.Round(result.Items.Sum(p3 => p3.CurrentValue), 2);
+            result.PurchaseValue = Math.Round(result.Items.Sum(p3 => p3.PurchaseValue), 2);
+            result.Profit = Math.Round(result.Items.Sum(p3 => p3.Profit), 2);
+            result.Growth = Math.Round(result.Profit / result.PurchaseValue * 100, 2);
+            result.Dividends = result.Items.Sum(p3 => p3.Dividends);
+            result.IRR = CalculateIRR(txns, result.Items.Max(p3 => p3.LastPriceDate), result.Items.Sum(p3 => p3.CurrentValue)) * 100;
+            result.AnnualisedReturn = (decimal)Math.Round(Math.Pow((double)((result.Profit + result.Dividends) / result.PurchaseValue + 1), 1 / ((result.Items.Max(p3 => p3.LastPriceDate) - txns.Min(t => t.TxnDate)).TotalDays / 365)) * 100 - 100, 2);
+
             return result;
         }
 
@@ -120,6 +128,9 @@ namespace Portfolio2.Controllers.api
                 {
                     irr += 0.01M;
                     npv = CalculateNPV(txns, currentDate, irr);
+
+                    if (irr > 10)
+                        return irr;
                 }
             }
             else
@@ -128,6 +139,8 @@ namespace Portfolio2.Controllers.api
                 {
                     irr -= 0.01M;
                     npv = CalculateNPV(txns, currentDate, irr);
+                    if (irr < -10)
+                        return irr;
                 }
             }
             return irr;

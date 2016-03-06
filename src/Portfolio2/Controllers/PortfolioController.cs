@@ -24,34 +24,17 @@ namespace Portfolio2.Controllers
         public IActionResult Index()
         {
             return View();
-
-            var txns = (from t in _db.Txns.Include(t => t.Stock)
-                        orderby t.Stock.Code, t.TxnDate
-                        select t).ToList();
-            var portfolio = ProcessPortfolio(txns);
-
-            ViewBag.Count = portfolio.Count(p => p.Units > 0);
-            ViewBag.CurrentValue = portfolio.Sum(p => p.CurrentValue);
-            ViewBag.PurchaseValue = Math.Round(portfolio.Sum(p => p.PurchaseValue), 2);
-            ViewBag.Profit = Math.Round(portfolio.Sum(p => p.Profit), 2);
-            ViewBag.Growth = Math.Round(ViewBag.Profit / ViewBag.PurchaseValue * 100, 2);
-            ViewBag.Dividends = portfolio.Sum(p => p.Dividends);
-            ViewBag.IRR = CalculateIRR(txns, portfolio.Max(p => p.LastPriceDate), portfolio.Sum(p => p.CurrentValue)) * 100;
-            ViewBag.AnnualisedReturn = Math.Round(Math.Pow((double)((ViewBag.Profit + ViewBag.Dividends) / ViewBag.PurchaseValue + 1), 1 / ((portfolio.Max(p => p.LastPriceDate) - txns.Min(t => t.TxnDate)).TotalDays / 365)) * 100 - 100, 2);
-
-
-            return View(portfolio);
         }
 
-        List<Portfolio> ProcessPortfolio(List<Data.Models.Txn> txns)
+        List<PortfolioItem> ProcessPortfolio(List<Data.Models.Txn> txns)
         {
-            var result = new List<Portfolio>();
-            Portfolio p = null;
+            var result = new List<PortfolioItem>();
+            PortfolioItem p = null;
             foreach (var t in txns)
             {
                 if (p == null || p.Code != t.Stock.Code)
                 {
-                    p = new Portfolio();
+                    p = new PortfolioItem();
                     p.Code = t.Stock.Code;
                     p.StockId = t.StockId;
                     result.Add(p);
