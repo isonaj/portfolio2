@@ -18,7 +18,6 @@ namespace Portfolio2.Data
         static PortfolioContext()
         {
             Database.SetInitializer<PortfolioContext>(new CreateDatabaseIfNotExists<PortfolioContext>());
-
         }
         */
     }

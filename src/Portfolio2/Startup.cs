@@ -66,6 +66,10 @@ namespace Portfolio2
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // Apply any migrations to the target database
+            PortfolioContext context = new PortfolioContext();
+            context.Database.Migrate();
         }
 
         // Entry point for the application.
