@@ -150,71 +150,67 @@ namespace Portfolio2.Controllers.api
             }
             return irr;
         }
-
+        */
+            
         //http://www.codeproject.com/Tips/461049/Internal-Rate-of-Return-IRR-Calculation
-#define LOW_RATE 0.01
-#define HIGH_RATE 0.5
-#define MAX_ITERATION 1000
-#define PRECISION_REQ 0.00000001
         decimal CalculateIRR(List<Txn> txns, DateTime currentDate, decimal currentValue)
         {
-        int i = 0,j = 0;
- double m = 0.0;
- double old = 0.00;
- double new = 0.00;
- double oldguessRate = LOW_RATE;
- double newguessRate = LOW_RATE;
- double guessRate = LOW_RATE;
- double lowGuessRate = LOW_RATE;
- double highGuessRate = HIGH_RATE;
- double npv = 0.0;
- double denom = 0.0;
-            Func<decimal, decimal> f = (x) => CalculateNPV(txns, currentDate, x);
+            decimal old = 0;
+            decimal neW = 0;
+            decimal oldguessRate = -1;
+            decimal newguessRate = -1;
+            decimal guessRate = -1;
+            decimal lowGuessRate = -1;
+            decimal highGuessRate = 10;
+            Func<decimal, decimal> f = (x) => currentValue - CalculateNPV(txns, currentDate, x);
             for (var i = 0; i < 100; i++)
             {
                 var npv = f(guessRate);
-/* Stop checking once the required precision is achieved 
-  if((npv > 0) && (npv<PRECISION_REQ))
-   return guessRate;
-  if(old == 0)
-   old = npv;
-  else
-   old = new;
-  new = npv;
-  if(i > 0)
-  {
-   if(old< new)
-   {
-    if(old< 0 && new < 0)
-     highGuessRate = newguessRate;
-    else
-     lowGuessRate = newguessRate;
-   }
-   else
-   {
-    if(old > 0 && new > 0)
-     lowGuessRate = newguessRate;
-    else
-     highGuessRate = newguessRate;
-   }
-  }
-  oldguessRate = guessRate;
-  guessRate = (lowGuessRate + highGuessRate) / 2;
-  newguessRate = guessRate;            }
+                /* Stop checking once the required precision is achieved */
+                if (Math.Abs(highGuessRate - lowGuessRate) < 0.001M)
+                    return guessRate;
+                if (old == 0)
+                    old = npv;
+                else
+                    old = neW;
+                neW = npv;
+                if (i > 0)
+                {
+                    if (old < neW)
+                    {
+                        if (old < 0 && neW < 0)
+                            highGuessRate = newguessRate;
+                        else
+                            lowGuessRate = newguessRate;
+                    }
+                    else
+                    {
+                        if (old > 0 && neW > 0)
+                            lowGuessRate = newguessRate;
+                        else
+                            highGuessRate = newguessRate;
+                    }
+                }
+                oldguessRate = guessRate;
+                guessRate = (lowGuessRate + highGuessRate) / 2;
+                newguessRate = guessRate;
+            }
             return 999;
         }
-        */
+        
 
+        
+        /*
         // Use Brent's method for calculating IRR
         // https://en.wikipedia.org/wiki/Brent%27s_method
         // http://apps.nrbook.com/empanel/index.html#pg=454
         decimal CalculateIRR(List<Txn> txns, DateTime currentDate, decimal currentValue)
         {
             var tol = 0.01M; // Tolerance
-            Func<decimal, decimal> f = (x) => CalculateNPV(txns, currentDate, x);
-            decimal a = -100M;  // min
+            Func<decimal, decimal> f = (x) => currentValue - CalculateNPV(txns, currentDate, x);
+            decimal a = -0.99M;  // min
             decimal b = 100M;   // max
-            decimal c = 100M;
+            decimal c = 1M;
             var fa = f(a);
             var fb = f(b);
             decimal d = 0, e = 0, fc, p, q, r, s, xm, tol1;
@@ -293,6 +289,7 @@ namespace Portfolio2.Controllers.api
             }
             return 999M;
         }
+        */
 
         decimal CalculateNPV(List<Txn> txns, DateTime asAt, decimal rate)
         {

@@ -68,8 +68,8 @@ namespace Portfolio2
             });
 
             // Apply any migrations to the target database
-            PortfolioContext context = new PortfolioContext();
-            context.Database.Migrate();
+            //PortfolioContext context = new PortfolioContext();
+            //context.Database.Migrate();
         }
 
         // Entry point for the application.
