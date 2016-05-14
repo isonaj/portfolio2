@@ -10,7 +10,8 @@ namespace Portfolio2.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Portfolio");
+            //return View();
         }
 
         public IActionResult Error()

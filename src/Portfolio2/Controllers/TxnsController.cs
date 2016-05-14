@@ -7,6 +7,8 @@ using Portfolio2.Data;
 using Portfolio2.Data.Models;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
+using System.Text;
+using System.IO;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,7 +29,7 @@ namespace Portfolio2.Controllers
         {
             ViewBag.TypeList = _typeList;
             return View((from t in _db.Txns.Include(t => t.Stock)
-                         orderby t.TxnDate, t.Stock.Code
+                         orderby t.TxnDate descending, t.Stock.Code
                          select t).ToList());
         }
 
@@ -62,6 +64,18 @@ namespace Portfolio2.Controllers
             }
 
             return View(txn);
+        }
+
+        public IActionResult DownloadFile()
+        {
+            var file = new StringBuilder();
+            var txns = _db.Txns.Include((t) => t.Stock).OrderBy((t) => t.TxnDate);
+            foreach(var txn in txns)
+                file.AppendLine(string.Format("{0},{1},{2},{3},{4}", txn.Stock.Code, txn.TxnDate.ToString("yyyyMMdd"), txn.TxnType, txn.Units, txn.Amount));
+
+            return File(Encoding.UTF8.GetBytes(file.ToString()),
+                        "text/plain",
+                        "txns.txt");
         }
     }
 }

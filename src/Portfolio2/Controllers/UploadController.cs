@@ -31,7 +31,7 @@ namespace Portfolio2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(ICollection<IFormFile> files)
+        public async Task<IActionResult> Index(string type, ICollection<IFormFile> files)
         {
             //var uploads = Path.Combine(_environment.WebRootPath, "uploads");
             foreach (var file in files)
@@ -40,14 +40,17 @@ namespace Portfolio2.Controllers
                 {
                     using (var stream = file.OpenReadStream())
                     {
-                        await ProcessStockEasyFile(stream);
+                        if (type == "Txns")
+                            await ProcessTxnFile(stream);
+                        else
+                            await ProcessStockEasyFile(stream);
                     }
                     //var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                     //await file.SaveAsAsync(Path.Combine(uploads, fileName));
                 }
             }
 
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         async Task ProcessStockEasyFile(Stream stream)
@@ -95,11 +98,45 @@ namespace Portfolio2.Controllers
             }
         }
 
-        /*
-        async Task ProcessTxnFile(string fileName)
+        async Task ProcessTxnFile(Stream stream)
         {
+            string line;
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                while ((line = await reader.ReadLineAsync()) != null)
+                {
+                    var tokens = line.Split(',');
+                    //Ignore empty lines
+                    if (tokens.Length > 1)
+                    {
+                        if (tokens.Length != 7)
+                            throw new Exception("Invalid file format");
 
+                        string code = tokens[0];
+                        DateTime date = DateTime.ParseExact(tokens[1], "yyyyMMdd", CultureInfo.InvariantCulture);
+                        string type = tokens[2];
+                        int units = Int32.Parse(tokens[3]);
+                        decimal amount = Decimal.Parse(tokens[4]);
+
+                        var stock = _db.Stocks.SingleOrDefault(s => s.Code == code);
+                        if (stock != null)
+                        {
+                            var txn = _db.Txns.SingleOrDefault(ph => ph.StockId == stock.Id && ph.TxnDate == date);
+                            if (txn == null)
+                            {
+                                txn = new Txn { StockId = stock.Id, TxnDate = date };
+                                _db.Txns.Add(txn);
+                            }
+
+                            txn.TxnType = type;
+                            txn.Units = units;
+                            txn.Amount = amount;
+                        }
+                    }
+                }
+
+                await _db.SaveChangesAsync();
+            }
         }
-        */
     }
 }

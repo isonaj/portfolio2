@@ -122,6 +122,7 @@ namespace Portfolio2.Controllers.api
             return result;
         }
 
+        /*
         decimal CalculateIRR(List<Txn> txns, DateTime currentDate, decimal currentValue)
         {
             decimal irr = 0M;
@@ -148,6 +149,149 @@ namespace Portfolio2.Controllers.api
                 }
             }
             return irr;
+        }
+
+        //http://www.codeproject.com/Tips/461049/Internal-Rate-of-Return-IRR-Calculation
+#define LOW_RATE 0.01
+#define HIGH_RATE 0.5
+#define MAX_ITERATION 1000
+#define PRECISION_REQ 0.00000001
+        decimal CalculateIRR(List<Txn> txns, DateTime currentDate, decimal currentValue)
+        {
+        int i = 0,j = 0;
+ double m = 0.0;
+ double old = 0.00;
+ double new = 0.00;
+ double oldguessRate = LOW_RATE;
+ double newguessRate = LOW_RATE;
+ double guessRate = LOW_RATE;
+ double lowGuessRate = LOW_RATE;
+ double highGuessRate = HIGH_RATE;
+ double npv = 0.0;
+ double denom = 0.0;
+            Func<decimal, decimal> f = (x) => CalculateNPV(txns, currentDate, x);
+            for (var i = 0; i < 100; i++)
+            {
+                var npv = f(guessRate);
+/* Stop checking once the required precision is achieved 
+  if((npv > 0) && (npv<PRECISION_REQ))
+   return guessRate;
+  if(old == 0)
+   old = npv;
+  else
+   old = new;
+  new = npv;
+  if(i > 0)
+  {
+   if(old< new)
+   {
+    if(old< 0 && new < 0)
+     highGuessRate = newguessRate;
+    else
+     lowGuessRate = newguessRate;
+   }
+   else
+   {
+    if(old > 0 && new > 0)
+     lowGuessRate = newguessRate;
+    else
+     highGuessRate = newguessRate;
+   }
+  }
+  oldguessRate = guessRate;
+  guessRate = (lowGuessRate + highGuessRate) / 2;
+  newguessRate = guessRate;            }
+            return 999;
+        }
+        */
+
+        // Use Brent's method for calculating IRR
+        // https://en.wikipedia.org/wiki/Brent%27s_method
+        // http://apps.nrbook.com/empanel/index.html#pg=454
+        decimal CalculateIRR(List<Txn> txns, DateTime currentDate, decimal currentValue)
+        {
+            var tol = 0.01M; // Tolerance
+            Func<decimal, decimal> f = (x) => CalculateNPV(txns, currentDate, x);
+            decimal a = -100M;  // min
+            decimal b = 100M;   // max
+            decimal c = 100M;
+            var fa = f(a);
+            var fb = f(b);
+            decimal d = 0, e = 0, fc, p, q, r, s, xm, tol1;
+
+            // Check if root is bracketed
+            if (fa * fb >= 0)
+                return 999M;
+            fc = fb;
+            for (var i = 0; i < 100; i++)
+            {
+                if ((fb > 0 && fc > 0) || (fb < 0 && fc < 0))
+                {
+                    c = a;
+                    fc = fa;
+                    d = b - a;
+                    e = d;
+                }
+                if (Math.Abs(fc) > Math.Abs(fb))
+                {
+                    a = b;
+                    b = c;
+                    c = a;
+                    fa = fb;
+                    fb = fc;
+                    fc = fa;
+                }
+                tol1 = 0.000002M * Math.Abs(b) + 0.5M * tol;
+                xm = 0.5M * (c - b);
+                if (Math.Abs(xm) <= tol1 || fb == 0)
+                    return b;
+                if (Math.Abs(e) >= tol1 && Math.Abs(fa) > Math.Abs(fb))
+                {
+                    s = fb / fa;
+                    if (a == c)
+                    {
+                        p = 2 * xm * s;
+                        q = 1 - s;
+                    }
+                    else
+                    {
+                        q = fa / fc;
+                        r = fb / fc;
+                        p = s * (2 * xm * q * (q - r) - (b - a) * (r - 1));
+                        q = (q - 1) * (r - 1) * (s - 1);
+                    }
+                    if (p > 0)
+                        q = -q;
+                    p = Math.Abs(p);
+                    var min1 = 3 * xm * q - Math.Abs(tol1 * q);
+                    var min2 = Math.Abs(e * q);
+                    if (2 * p < (min1 < min2 ? min1: min2))
+                    {
+                        e = d;
+                        d = p / q;
+                    }
+                    else
+                    {
+                        d = xm;
+                        e = d;
+                    }
+                }
+                else
+                {
+                    d = xm;
+                    e = d;
+                }
+                a = b;
+                fa = fb;
+                if (Math.Abs(d) > tol1)
+                    b += d;
+                else
+                {
+                    b += tol1 * Math.Sign(xm); 
+                    fb = f(b);
+                }
+            }
+            return 999M;
         }
 
         decimal CalculateNPV(List<Txn> txns, DateTime asAt, decimal rate)
