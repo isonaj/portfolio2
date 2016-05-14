@@ -79,6 +79,9 @@ namespace Portfolio2.Controllers.api
                 if (t.TxnType == "Dividend")
                     p.Dividends += t.Amount;
 
+                if (t.TxnType == "Sell")
+                    p.RealisedProfit += t.Amount + (p.PurchasePrice * t.Units);
+
                 p.Txns.Add(t);
             }
 
@@ -93,14 +96,14 @@ namespace Portfolio2.Controllers.api
                 p2.LastPriceDate = price == null ? DateTime.Today : price.PriceDate;
 
                 p2.CurrentValue = p2.Units * p2.LastPrice;
-                p2.Profit = p2.CurrentValue - p2.PurchaseValue;
+                p2.UnrealisedProfit = p2.CurrentValue - p2.PurchaseValue;
                 if (p2.PurchaseValue != 0)
-                    p2.Growth = Math.Round(p2.Profit / p2.PurchaseValue * 100, 1);
+                    p2.Growth = Math.Round(p2.UnrealisedProfit / p2.PurchaseValue * 100, 1);
 
                 //Annualised Return
                 if (p2.PurchaseValue != 0)
                 {
-                    double totReturn = (double)((p2.Profit + p2.Dividends) / p2.PurchaseValue + 1);
+                    double totReturn = (double)((p2.UnrealisedProfit + p2.Dividends) / p2.PurchaseValue + 1);
                     double totYears = ((p2.LastPriceDate - p2.Txns[0].TxnDate).TotalDays / 365);
                     p2.AnnualisedReturn = Math.Round(((decimal)Math.Pow(totReturn, 1 / totYears) - 1) * 100, 1);
                 }
@@ -109,11 +112,12 @@ namespace Portfolio2.Controllers.api
 
             result.CurrentValue = Math.Round(result.Items.Sum(p3 => p3.CurrentValue), 2);
             result.PurchaseValue = Math.Round(result.Items.Sum(p3 => p3.PurchaseValue), 2);
-            result.Profit = Math.Round(result.Items.Sum(p3 => p3.Profit), 2);
-            result.Growth = Math.Round(result.Profit / result.PurchaseValue * 100, 2);
+            result.UnrealisedProfit = Math.Round(result.Items.Sum(p3 => p3.UnrealisedProfit), 2);
+            result.RealisedProfit = Math.Round(result.Items.Sum(p3 => p3.RealisedProfit), 2);
+            result.Growth = Math.Round(result.UnrealisedProfit / result.PurchaseValue * 100, 2);
             result.Dividends = result.Items.Sum(p3 => p3.Dividends);
             result.IRR = CalculateIRR(txns, result.Items.Max(p3 => p3.LastPriceDate), result.Items.Sum(p3 => p3.CurrentValue)) * 100;
-            result.AnnualisedReturn = (decimal)Math.Round(Math.Pow((double)((result.Profit + result.Dividends) / result.PurchaseValue + 1), 1 / ((result.Items.Max(p3 => p3.LastPriceDate) - txns.Min(t => t.TxnDate)).TotalDays / 365)) * 100 - 100, 2);
+            result.AnnualisedReturn = (decimal)Math.Round(Math.Pow((double)((result.UnrealisedProfit + result.Dividends + result.RealisedProfit) / result.PurchaseValue + 1), 1 / ((result.Items.Max(p3 => p3.LastPriceDate) - txns.Min(t => t.TxnDate)).TotalDays / 365)) * 100 - 100, 2);
 
             return result;
         }

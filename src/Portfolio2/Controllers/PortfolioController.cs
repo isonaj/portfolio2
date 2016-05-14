@@ -49,6 +49,9 @@ namespace Portfolio2.Controllers
                 if (t.TxnType == "Dividend")
                     p.Dividends += t.Amount;
 
+                if (t.TxnType == "Sell")
+                    p.RealisedProfit += t.Amount + (p.PurchasePrice * t.Units);
+
                 p.Txns.Add(t);
             }
 
@@ -63,14 +66,14 @@ namespace Portfolio2.Controllers
                 p2.LastPriceDate = price == null ? DateTime.Today : price.PriceDate;
 
                 p2.CurrentValue = p2.Units * p2.LastPrice;
-                p2.Profit = p2.CurrentValue - p2.PurchaseValue;
+                p2.UnrealisedProfit = p2.CurrentValue - p2.PurchaseValue + p.RealisedProfit;
                 if (p2.PurchaseValue != 0)
-                    p2.Growth = p2.Profit / p2.PurchaseValue * 100;
+                    p2.Growth = p2.UnrealisedProfit / p2.PurchaseValue * 100;
 
                 //Annualised Return
                 if (p2.PurchaseValue != 0)
                 {
-                    double totReturn = (double)((p2.Profit + p2.Dividends) / p2.PurchaseValue + 1);
+                    double totReturn = (double)((p2.UnrealisedProfit + p2.Dividends) / p2.PurchaseValue + 1);
                     double totYears = ((p2.LastPriceDate - p2.Txns[0].TxnDate).TotalDays / 365);
                     p2.AnnualisedReturn = ((decimal)Math.Pow(totReturn, 1 / totYears) - 1) * 100;
                 }

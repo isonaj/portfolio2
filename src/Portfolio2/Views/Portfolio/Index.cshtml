@@ -2,38 +2,48 @@
     ViewBag.Title = "Portfolio";
 }
 
+<style>
+    thead tr th {
+        cursor: pointer;
+    }
+</style>
+
 <h2>@ViewData["Title"]</h2>
 
 <div ng-controller="portfolioController">
-    <table class="table">
+    <span>Hide Zero Units</span>
+    <input ng-model="hideZeroes" type="checkbox" />
+    <table class="table table-condensed">
         <thead>
             <tr>
-                <th>Code <i class="fa fa-sort-asc"></i></th>
-                <th class="text-right">Units</th>
-                <th class="text-right">Last Price</th>
-                <th class="text-right">Purchase Price</th>
-                <th class="text-right">Current Value</th>
-                <th class="text-right">Purchase Value</th>
-                <th class="text-right">Profit</th>
-                <th class="text-right">Growth %</th>
-                <th class="text-right">Dividends</th>
-                <th class="text-right">IRR</th>
-                <th class="text-right">Ann. Return</th>
+                <th ng-click="sort('Code')">Code <span ng-class="class('Code')"></span></th>
+                <th class="text-right" ng-click="sort('Units')">Units <span ng-class="class('Units')"></span></th>
+                <th class="text-right" ng-click="sort('LastPrice')">Last Price <span ng-class="class('LastPrice')"></span></th>
+                <th class="text-right" ng-click="sort('PurchasePrice')">Purchase Price <span ng-class="class('PurchasePrice')"></span></th>
+                <th class="text-right" ng-click="sort('CurrentValue')">Current Value <span ng-class="class('CurrentValue')"></span></th>
+                <th class="text-right" ng-click="sort('PurchaseValue')">Purchase Value <span ng-class="class('PurchaseValue')"></span></th>
+                <th class="text-right" ng-click="sort('UnrealisedProfit')">Unrealised Profit <span ng-class="class('UnrealisedProfit')"></span></th>
+                <th class="text-right" ng-click="sort('Growth')">Growth % <span ng-class="class('Growth')"></span></th>
+                <th class="text-right" ng-click="sort('Dividends')">Dividends <span ng-class="class('Dividends')"></span></th>
+                <th class="text-right" ng-click="sort('RealisedProfit')">Realised Profit <span ng-class="class('RealisedProfit')"></span></th>
+                <th class="text-right" ng-click="sort('IRR')">IRR <span ng-class="class('IRR')"></span></th>
+                <th class="text-right" ng-click="sort('AnnualisedReturn')">Ann. Return <span ng-class="class('AnnualisedReturn')"></span></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="p in portfolio.Items">
+            <tr ng-repeat="p in portfolio.Items|orderBy:sortCol:sortRev">
                 <td>{{p.Code}}</td>
                 <td class="text-right">{{p.Units}}</td>
                 <td class="text-right">{{p.LastPrice}}</td>
-                <td class="text-right">{{p.PurchasePrice}}</td>
-                <td class="text-right">{{p.CurrentValue}}</td>
-                <td class="text-right">{{p.PurchaseValue}}</td>
-                <td class="text-right">{{p.Profit}}</td>
-                <td class="text-right">{{p.Growth}}%</td>
-                <td class="text-right">{{p.Dividends}}</td>
+                <td class="text-right">{{p.PurchasePrice|number:3}}</td>
+                <td class="text-right">{{p.CurrentValue|currency}}</td>
+                <td class="text-right">{{p.PurchaseValue|currency}}</td>
+                <td class="text-right">{{p.UnrealisedProfit|currency}}</td>
+                <td class="text-right">{{p.Growth|number:1}}%</td>
+                <td class="text-right">{{p.Dividends|currency}}</td>
+                <td class="text-right">{{p.RealisedProfit|currency}}</td>
                 <td class="text-right">{{p.IRR}}%</td>
-                <td class="text-right">{{p.AnnualisedReturn}}%</td>
+                <td class="text-right">{{p.AnnualisedReturn|number:1}}%</td>
             </tr>
         </tbody>
         <tfoot>
@@ -42,11 +52,12 @@
                 <th class="text-right">{{p.Items.Length}}</th>
                 <th></th>
                 <th></th>
-                <th class="text-right">{{portfolio.CurrentValue}}</th>
-                <th class="text-right">{{portfolio.PurchaseValue}}</th>
-                <th class="text-right">{{portfolio.Profit}}</th>
+                <th class="text-right">{{portfolio.CurrentValue|currency}}</th>
+                <th class="text-right">{{portfolio.PurchaseValue|currency}}</th>
+                <th class="text-right">{{portfolio.UnrealisedProfit|currency}}</th>
                 <th class="text-right">{{portfolio.Growth}}%</th>
-                <th class="text-right">{{portfolio.Dividends}}</th>
+                <th class="text-right">{{portfolio.Dividends|currency}}</th>
+                <th class="text-right">{{portfolio.RealisedProfit|currency}}</th>
                 <th class="text-right">{{portfolio.IRR}}%</th>
                 <th class="text-right">{{portfolio.AnnualisedReturn}}%</th>
             </tr>

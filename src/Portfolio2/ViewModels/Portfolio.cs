@@ -9,7 +9,8 @@ namespace Portfolio2.ViewModels
     {
         public decimal CurrentValue { get; set; }
         public decimal PurchaseValue { get; set; }
-        public decimal Profit { get; set; }
+        public decimal UnrealisedProfit { get; set; }
+        public decimal RealisedProfit { get; set; }
         public decimal Growth { get; set; }
         public decimal Dividends { get; set; }
         public decimal IRR { get; set; }
